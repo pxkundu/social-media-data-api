@@ -1,251 +1,132 @@
-# LinkedIn Data Analytics Platform
+# LinkedIn Data Analytics Application
 
-A self-hosted platform for personal LinkedIn data analytics and insights. This application allows you to fetch, analyze, and visualize your LinkedIn profile data, posts, and articles in a modern, user-friendly interface.
+## Project Overview
+
+This project is a web application designed to fetch and analyze personal data from LinkedIn using the LinkedIn Marketing API (assuming adaptation for personal data access based on project evolution). It features a React frontend for visualization and user interaction, a Python FastAPI backend for API communication and data processing, and AWS infrastructure provisioned with Terraform.
+
+## Architecture
+
+- **Frontend**: Built with React, utilizing Material-UI for a responsive and modern user interface. Includes pages for viewing Profile, Posts, Articles, and Analytics, as well as a Configuration page for managing LinkedIn credentials.
+- **Backend**: Developed with Python FastAPI. It handles authentication via OAuth 2.0, securely stores credentials using encryption, fetches data from the LinkedIn API, and exposes endpoints for the frontend.
+- **Infrastructure**: Provisioned on AWS using Terraform. Designed as a microservices architecture running on Amazon ECS (Fargate), utilizing RDS for the database, ALB for load balancing, CloudFront for CDN, Route53 for DNS, S3 for static frontend hosting, CloudWatch for logging, and appropriate IAM roles and Security Groups.
+- **CI/CD**: Automated pipelines using GitHub Actions for building, testing, and deploying both the application code and the infrastructure.
 
 ## Features
 
-- **Profile Analytics**: View and analyze your LinkedIn profile data
-- **Posts Analytics**: Track engagement and performance of your LinkedIn posts
-- **Articles Analytics**: Monitor the performance of your LinkedIn articles
-- **Data Visualization**: Interactive charts and graphs for better insights
-- **Secure Configuration**: Encrypted storage of LinkedIn API credentials
-- **Modern UI**: Clean, responsive interface inspired by LinkedIn's design
-
-## Tech Stack
-
-### Frontend
-- React.js
-- Material-UI
-- Recharts for data visualization
-- React Router for navigation
-
-### Backend
-- Python FastAPI
-- LinkedIn API v2
-- Cryptography for secure credential storage
-- SQLite for local data storage
-
-## Prerequisites
-
-- Python 3.8+
-- Node.js 14+
-- LinkedIn Developer Account
-- LinkedIn API Access
+- Secure OAuth 2.0 flow for LinkedIn authentication.
+- Encrypted storage of sensitive LinkedIn credentials.
+- Display of personal LinkedIn Profile, Posts, and Articles (based on API access).
+- Analytics dashboard with dummy data visualization (ready for real data integration).
+- Responsive UI/UX using Material-UI.
+- GitHub Actions for automated application and infrastructure deployment.
+- Terraform for reproducible infrastructure provisioning.
 
 ## Setup Instructions
 
-### 1. LinkedIn Developer Setup
+1.  **Clone the repository:**
 
-1. Go to [LinkedIn Developers Portal](https://www.linkedin.com/developers/apps)
-2. Create a new app
-3. Configure the following:
-   - OAuth 2.0 settings
-   - Redirect URL: `http://localhost:3000/api/auth/callback`
-   - Required permissions:
-     - `r_liteprofile`
-     - `r_emailaddress`
-     - `w_member_social`
-     - `r_basicprofile`
+    ```bash
+    git clone <your_repo_url>
+    cd social-media-data-api # or your project root directory
+    ```
 
-### 2. Backend Setup
+2.  **LinkedIn Developer Setup:**
+    -   Follow the instructions to create a LinkedIn Developer application and obtain your Client ID and Client Secret. You will also need to set up redirect URIs for the OAuth flow.
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd linkedin-data-analytics
-   ```
+3.  **AWS Setup:**
+    -   Ensure you have an AWS account configured with necessary permissions to create resources (VPC, ECS, RDS, ALB, CloudFront, Route53, S3, CloudWatch, IAM, Security Groups).
+    -   Configure an S3 bucket and a DynamoDB table for Terraform remote state and state locking, respectively.
+    -   Set up an ACM certificate for your domain in the AWS region you plan to deploy to.
+    -   Configure an IAM OIDC provider and role in AWS for GitHub Actions to assume during Terraform deployments. Replace the placeholder ARN in `.github/workflows/terraform.yml`.
 
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+4.  **Environment Variables:**
+    -   Create `.env` files for both the backend and frontend based on the provided examples:
+        -   Copy `backend/.env.example` to `backend/.env` and fill in your LinkedIn credentials, database connection details, and other configurations.
+        -   Copy `frontend/.env.example` to `frontend/.env` and fill in the backend API URL and other frontend configurations.
 
-3. Install dependencies:
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   ```
+5.  **Install Dependencies:**
+    -   **Backend:**
 
-4. Create a `.env` file in the backend directory:
-   ```
-   LINKEDIN_CLIENT_ID=your_client_id
-   LINKEDIN_CLIENT_SECRET=your_client_secret
-   LINKEDIN_ACCESS_TOKEN=your_access_token
-   HOST=localhost
-   PORT=8000
-   ```
+        ```bash
+        cd backend
+        pip install -r requirements.txt
+        ```
 
-5. Start the backend server:
-   ```bash
-   uvicorn main:app --reload
-   ```
+    -   **Frontend:**
 
-### 3. Frontend Setup
+        ```bash
+        cd frontend
+        npm install
+        ```
 
-1. Install dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
+## Running Locally
 
-2. Start the development server:
-   ```bash
-   npm start
-   ```
+1.  **Start the Backend:**
 
-## Usage Guide
+    ```bash
+    cd backend
+    uvicorn main:app --reload
+    ```
 
-### 1. Configuration
+2.  **Start the Frontend:**
 
-1. Access the Configuration page through the navigation menu
-2. Enter your LinkedIn API credentials:
-   - Client ID
-   - Client Secret
-   - Access Token
-3. Save the configuration (credentials are encrypted and stored securely)
+    ```bash
+    cd frontend
+    npm start
+    ```
 
-### 2. Data Access
-
-- **Profile**: View your LinkedIn profile data and analytics
-- **Posts**: Analyze your LinkedIn posts' performance
-- **Articles**: Track your LinkedIn articles' engagement
-- **Analytics**: View comprehensive analytics and insights
-
-### 3. Data Refresh
-
-- Use the refresh button on each page to fetch the latest data
-- Data is cached locally for better performance
-- Manual refresh available for real-time updates
-
-## Security Considerations
-
-- All API credentials are encrypted using Fernet encryption
-- Credentials are stored locally and never transmitted to external servers
-- OAuth 2.0 implementation for secure authentication
-- HTTPS recommended for production deployment
-
-## Development
-
-### Project Structure
-
-```
-linkedin-data-analytics/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── services/
-│   │   └── models/
-│   ├── main.py
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── services/
-│   └── package.json
-└── README.md
-```
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## Troubleshooting
-
-### Common Issues
-
-1. **API Authentication Failed**
-   - Verify your credentials in the Configuration page
-   - Check if your LinkedIn app has the required permissions
-   - Ensure your access token is valid
-
-2. **Data Not Loading**
-   - Check your internet connection
-   - Verify backend server is running
-   - Check browser console for errors
-
-3. **Configuration Issues**
-   - Ensure all required fields are filled
-   - Check if the backend server is accessible
-   - Verify the encryption key is properly set
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support, please:
-1. Check the troubleshooting guide
-2. Search existing issues
-3. Create a new issue if needed
-
-## Acknowledgments
-
-- LinkedIn API Documentation
-- FastAPI Documentation
-- Material-UI Documentation
-- React Documentation
+    The frontend should open in your browser, typically at `http://localhost:3000`.
 
 ## Deployment
 
-### GitHub Pages Deployment
+The project includes GitHub Actions workflows for automated CI/CD.
 
-1. Fork this repository to your GitHub account
-2. Enable GitHub Pages in your repository settings:
-   - Go to Settings > Pages
-   - Select 'gh-pages' branch as source
-   - Save the settings
+-   **Application (Backend & Frontend):** The workflows in `.github/workflows/` handle building, testing, and deploying the backend to ECS and the frontend to GitHub Pages/S3.
+-   **Infrastructure:** The workflow in `.github/workflows/terraform.yml` automates the provisioning and management of AWS infrastructure using Terraform.
+    -   **Pull Requests:** Triggers `terraform plan` to show the proposed infrastructure changes.
+    -   **Pushes to `main`:** Triggers `terraform apply -auto-approve` to deploy infrastructure changes.
+    -   **Pushes to `develop`:** Triggers `terraform plan` and indicates manual approval is needed before deployment.
 
-3. Set up GitHub Secrets:
-   - Go to Settings > Secrets and variables > Actions
-   - Add the following secrets:
-     - `REACT_APP_API_URL`: Your backend API URL
-     - `HEROKU_API_KEY`: Your Heroku API key
-     - `HEROKU_APP_NAME`: Your Heroku app name
+**GitHub Secrets Required:**
+-   `TF_STATE_BUCKET_NAME`: Name of the S3 bucket for Terraform state.
+-   `TF_STATE_LOCK_TABLE`: Name of the DynamoDB table for Terraform state locking.
+-   `AWS_ACCOUNT_ID`: Your AWS Account ID.
+-   `AWS_REGION`: AWS region for deployment (should match `env.AWS_REGION` in workflow).
+-   `DB_PASSWORD`: Database master password.
+-   `DB_USERNAME`: Database master username.
+-   `DOMAIN_NAME`: Domain name for the application.
+-   `CERTIFICATE_ARN`: ARN of the SSL certificate.
+-   `ALB_ZONE_ID`: Zone ID of the ALB (can be obtained after initial ALB creation).
+-   `CF_ZONE_ID`: Zone ID of the CloudFront distribution (can be obtained after initial CloudFront creation).
 
-4. Push your changes to the main branch:
-   ```bash
-   git add .
-   git commit -m "Initial deployment"
-   git push origin main
-   ```
+**Note on `ALB_ZONE_ID` and `CF_ZONE_ID`:** These values are outputs of the ALB and CloudFront modules respectively. You might need to run `terraform apply` locally once to get these values before adding them as GitHub Secrets for subsequent automated deployments.
 
-5. The GitHub Actions workflow will automatically:
-   - Build the frontend
-   - Deploy it to GitHub Pages
-   - Deploy the backend to Heroku
+## Infrastructure Details
 
-Your application will be available at: `https://<your-github-username>.github.io/linkedin-data-analytics`
+The `infrastructure` directory contains Terraform modules for provisioning the following AWS resources:
+-   **VPC**: Network setup with public, private, and database subnets, NAT gateways, and VPC endpoints.
+-   **ECS**: Fargate cluster, task definition, service, and auto-scaling.
+-   **RDS**: PostgreSQL database instance with multi-AZ and encryption.
+-   **ALB**: Application Load Balancer for routing traffic to the ECS service.
+-   **CloudFront**: CDN for content delivery and SSL termination.
+-   **Route53**: DNS records pointing to ALB and CloudFront.
+-   **S3**: Bucket for hosting static frontend assets.
+-   **CloudWatch**: Log groups for application logs.
+-   **IAM**: Roles and policies (example provided).
+-   **Security Groups**: Network access control rules between components.
 
-### Environment Variables
+## DevSecOps Practices
 
-For local development, create a `.env` file in the frontend directory:
-```
-REACT_APP_API_URL=http://localhost:8000
-```
+-   **Infrastructure as Code (IaC)**: Using Terraform for reproducible infrastructure.
+-   **Automated Testing**: Terraform validate and fmt checks in the pipeline.
+-   **Security Analysis**: Integration of `tfsec` for static security analysis of Terraform code.
+-   **Secure Authentication**: Using AWS OIDC with GitHub Actions instead of long-lived keys.
+-   **Access Control**: Principle of least privilege applied through IAM roles and Security Groups.
 
-For production, set the environment variables in your deployment platform:
-- Frontend: Set `REACT_APP_API_URL` to your backend API URL
-- Backend: Set all required LinkedIn API credentials
+## Future Enhancements
 
-### Deployment Considerations
-
-1. **CORS Configuration**
-   - Update the backend CORS settings to allow requests from your GitHub Pages domain
-   - Add your GitHub Pages URL to the allowed origins
-
-2. **Security**
-   - Use HTTPS for all API calls
-   - Keep your API credentials secure
-   - Regularly rotate your access tokens
-
-3. **Performance**
-   - Enable caching where appropriate
-   - Use compression for API responses
-   - Optimize frontend assets
+-   Implement actual LinkedIn API calls for profile, posts, and articles data fetching.
+-   Populate the Analytics page with real data and advanced visualizations.
+-   Add more comprehensive unit and integration tests for both backend and frontend.
+-   Implement blue/green or canary deployment strategies for ECS.
+-   Integrate more DevSecOps tools (e.g., vulnerability scanning for container images).
