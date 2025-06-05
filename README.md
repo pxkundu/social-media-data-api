@@ -11,6 +11,133 @@ This project is a web application designed to fetch and analyze personal data fr
 - **Infrastructure**: Provisioned on AWS using Terraform. Designed as a microservices architecture running on Amazon ECS (Fargate), utilizing RDS for the database, ALB for load balancing, CloudFront for CDN, Route53 for DNS, S3 for static frontend hosting, CloudWatch for logging, and appropriate IAM roles and Security Groups.
 - **CI/CD**: Automated pipelines using GitHub Actions for building, testing, and deploying both the application code and the infrastructure.
 
+### Frontend Architecture Diagram
+
+```txt
++------------------+
+|     User Browser |
+| +----------------+
+| |                |
+| |  React App     |
+| |  (Material-UI) |
+| |                |
+| +-------+--------+
+|         |        
+|         | HTTP/S
+|         |        
++---------+--------+
+          | Frontend Routes
+          | (Profile, Posts, Articles, Analytics, Config)
+          |
++---------+--------+
+|   API Services   |
+| (api.js, etc.)   |
++------------------+
+```
+
+### Backend Architecture Diagram
+
+```txt
++----------------------+
+|      User Request    |
++----------+-----------+
+           |           
+           | HTTP/S
+           |           
++----------+-----------+
+|    ALB (via CF)      |
++----------+-----------+
+           |           
+           | HTTP
+           | (Internal)
++----------+-----------+
+|  ECS Service         |
+| +------------------+
+| |  FastAPI App     |
+| |  (/api/...)      |
+| | +--------------+
+| | |  API Endpoints |
+| | +------+-------+
+| |        |       
+| |  +-----+-----+
+| |  | Service   |
+| |  | Logic     |
+| |  +-----+-----+
+| |        |       
+| |  +-----+-----+
+| |  | Config    |
+| |  | Service   |
+| |  +-----------+
+| |        | (Enc/Dec)
+| |  +-----+-----+
+| |  | LinkedIn  |
+| |  | API Client|
+| |  +-----+-----+
+| |        |       
+| +--------+-------+
+|          |       
+|    +-----+------+
+|    | Database   |
+|    | (RDS)      |
+|    +------------+
++----------------------+
+```
+
+### Infrastructure Architecture Diagram
+
+```txt
++--------------+
+|    Internet  |
++------++------+
+       ||       
+       || HTTPS
+       ||       
++------++------+
+| CloudFront   |
+| (CDN/SSL)    |
++------++------+
+       ||       
+       || HTTPS
+       ||       
++------++------+
+| Route 53     |
+| (DNS)        |
++------++------+
+       ||       
+       || HTTPS
+       ||       
++------++------+
+| ALB          |
+| (Load Balancer)|
++------++------+
+       ||       
+       || HTTP (Internal)
+       ||       
++------++------+
+| Private Subnets|
+| +------------+ |
+| | ECS Service| |
+| | (Fargate)  | |
+| +------+-----+ |
+|        |       |
+| +------+-----+ |
+| | Database   | |
+| | (RDS)      | |
+| +------------+ |
++------++------+
+       ||       
+       || To AWS Services (S3, ECR, CloudWatch via Endpoints)
+       ||       
++------++------+
+| NAT Gateway  |
+| (Outbound)   |
++------++------+
+       ||       
++------++------+
+| Public Subnets |
++----------------+
+```
+
 ## Features
 
 - Secure OAuth 2.0 flow for LinkedIn authentication.
